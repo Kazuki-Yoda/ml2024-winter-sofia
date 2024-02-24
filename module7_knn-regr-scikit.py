@@ -1,4 +1,7 @@
+from typing import Tuple
+
 import numpy as np
+from sklearn.neighbors import KNeighborsRegressor
 
 class kNNRegression:
     """
@@ -13,10 +16,12 @@ class kNNRegression:
     In the end, the program asks the user for input X and outputs:
     the result (Y) of k-NN Regression if k <= N, or any error message otherwise.
 
-    The basic functionality of data processing
-    (data initialization,data insertion, data calculation)
-    should be done using Numpy library as much as possible
-    (note: you can combine with OOP from the previous task).
+    Additionally, if the program outputs Y, provide the coefficient of determination.
+
+    The basic functionality of data processing (data initialization, data insertion),
+    should be done using Numpy library while the computation (ML) part
+    should be done using Scikit-learn library as much as possible
+    (note: you can combine with what you've done from the previous task).
     """
     
     def __init__(self) -> None:
@@ -36,28 +41,35 @@ class kNNRegression:
         )
         
         print("Type X (a real number):")
-        x_fit = float(input())
+        x_fit = np.array([float(input())])
 
         if k > n:
             raise ValueError("The number of nearest neighbors k must be smaller"
                              + "than the number of inputs N.")
 
-        y_fit = self.fit(data, x_fit, k)
+        y_fit, score = self.fit(data, x_fit, k)
         print(f"Result of k-NN regression Y: {y_fit}")
+        print(f"Coefficient of determination: {score}")
     
-    def fit(self, data: np.ndarray, x_fit: np.ndarray, k: int) -> float:
+    def fit(self, data: np.ndarray, x_fit: np.ndarray, k: int
+            ) -> Tuple[np.ndarray, float]:
+        
         data = data.T  # Shape (N, 2) to (2, N)
         x_data = data[0]
+        x_data = x_data[:, None] # Shape (n_samples, n_features = 1)
         y_data = data[1]
 
-        distance = np.abs(x_data - x_fit)
-        nearest_indices = np.argsort(distance)
-        k_nearest_indices = nearest_indices[:k]
-        k_nearest_y = y_data[k_nearest_indices]
+        x_fit = x_fit[:, None] # Shape (n_samples == 1, n_features = 1)
 
-        y_fit = np.mean(k_nearest_y)
+        knn_regressor = KNeighborsRegressor(n_neighbors=k)
+        knn_regressor.fit(x_data, y_data)
 
-        return y_fit        
+        y_fit = knn_regressor.predict(x_fit)
+
+        # Coefficient of determination of the prediction.
+        score = knn_regressor.score(x_fit, y_fit)
+
+        return y_fit, score
 
     def input_integer(self) -> int:
         while True:

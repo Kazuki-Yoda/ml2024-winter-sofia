@@ -22,7 +22,7 @@ class kNNRegression:
     def __init__(self) -> None:
         pass
         
-    def main(self):
+    def run(self):
         print("Type the number of inputs N (positive integer):")
         n = self.input_positive_integer()
 
@@ -81,4 +81,4 @@ class kNNRegression:
 
 if __name__ == "__main__":
     search_list = kNNRegression()
-    search_list.main()
+    search_list.run()
